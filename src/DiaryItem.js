@@ -4,7 +4,7 @@ const DiaryItem = ({
   content,
   emotion,
   created_date,
-  onDelete,
+  onRemove,
 }) => {
   return (
     <div className="DiaryItem">
@@ -22,12 +22,13 @@ const DiaryItem = ({
         <button
           onClick={() => {
             if (window.confirm(`${id}번째 일기를 정말 삭제하시겠습니까?`)) {
-              onDelete(id);
+              onRemove(id);
             }
           }}
         >
           삭제
         </button>
+        <button>수정</button>
       </div>
     </div>
   );
