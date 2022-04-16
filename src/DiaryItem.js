@@ -6,6 +6,12 @@ const DiaryItem = ({
   created_date,
   onRemove,
 }) => {
+  const handleRemove = () => {
+    if (window.confirm(`${id}번째 일기를 정말 삭제하시겠습니까?`)) {
+      onRemove(id);
+    }
+  };
+
   return (
     <div className="DiaryItem">
       <div className="info">
@@ -19,16 +25,7 @@ const DiaryItem = ({
       </div>
       <div className="content">{content}</div>
       <div className="button">
-        <button
-          onClick={() => {
-            if (window.confirm(`${id}번째 일기를 정말 삭제하시겠습니까?`)) {
-              onRemove(id);
-            }
-          }}
-        >
-          삭제
-        </button>
-        <button>수정</button>
+        <button onClick={handleRemove}>삭제</button>
       </div>
     </div>
   );
