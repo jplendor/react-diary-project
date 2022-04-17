@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
@@ -52,14 +52,28 @@ function App() {
   const onEdit = (targetId, newContent) => {
     setData(
       data.map((item) =>
-        item.id === targetId ? { ...item, content: newContent } : it
+        item.id === targetId ? { ...item, content: newContent } : item
       )
     );
   };
 
+  const getDiaryAnalysis = useMemo(() => {
+    const goodCount = data.filter((item) => item.emotion >= 3).length;
+    const badCount = data.length - goodCount;
+    const goodRatio = (goodCount / data.length) * 100;
+    return { goodCount, badCount, goodRatio };
+  }, [data.length]);
+  // data.length가 바뀔 때만 callback 함수를 수행, 그 외는 연산하지 않고 메모된 값을 반환
+
+  const { goodCount, badCount, goodRatio } = getDiaryAnalysis;
+
   return (
     <div className="App">
       <DiaryEditor onCreate={onCreate} />
+      <div>전체 일기 : {data.length}</div>
+      <div>기분 좋은 일기 개수 : {goodCount}</div>
+      <div>기분 나쁜 일기 개수 : {badCount}</div>
+      <div>기분 좋은 일기 비율 : {goodRatio}</div>
       <DiaryList diaryList={data} onRemove={onRemove} onEdit={onEdit} />
     </div>
   );
