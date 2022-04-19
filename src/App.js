@@ -18,7 +18,7 @@ function App() {
         author: item.email,
         content: item.body,
         emotion: Math.floor(Math.random() * 5) + 1,
-        created_date: new Date().getDate(),
+        created_date: new Date().getTime(),
         id: dataId.current++,
       };
     });
