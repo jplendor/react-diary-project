@@ -1,10 +1,32 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT":
+      return action.data;
+    case "CREATE":
+      const created_date = new Date().getTime();
+      const newItem = { ...action.data, created_date };
+      return [newItem, ...state];
+    case "REMOVE":
+      return state.filter((item) => item.id !== action.targetId);
+    case "EDIT":
+      return state.map((item) =>
+        item.id === action.targetId
+          ? { ...item, content: action.newContent }
+          : item
+      );
+    default:
+      return state;
+  }
+};
+
 function App() {
-  const [data, setData] = useState([]);
+  // 상태 변화 로직을 컴포넌트 밖으로 분리하기 위해 "useState => useReducer로 변경"
+  const [data, dispatch] = useReducer(reducer, []);
 
   const dataId = useRef(0);
 
@@ -23,7 +45,7 @@ function App() {
       };
     });
 
-    setData(initData);
+    dispatch({ type: "INIT", data: initData });
   };
 
   useEffect(() => {
@@ -31,28 +53,20 @@ function App() {
   }, []);
 
   const onCreate = useCallback((author, content, emotion) => {
-    const created_date = new Date().getTime();
-    const newItem = {
-      author: author,
-      content: content,
-      emotion: emotion,
-      created_date: created_date,
-      id: dataId.current,
-    };
+    dispatch({
+      type: "CREATE",
+      data: { author, content, emotion, id: dataId.current },
+    });
+
     dataId.current += 1;
-    setData((data) => [newItem, ...data]);
   }, []);
 
   const onRemove = useCallback((targetId) => {
-    setData((data) => data.filter((item) => item.id !== targetId));
+    dispatch({ type: "REMOVE", targetId });
   }, []);
 
   const onEdit = useCallback((targetId, newContent) => {
-    setData((data) =>
-      data.map((item) =>
-        item.id === targetId ? { ...item, content: newContent } : item
-      )
-    );
+    dispatch({ type: "EDIT", targetId, newContent });
   }, []);
 
   const getDiaryAnalysis = useMemo(() => {
